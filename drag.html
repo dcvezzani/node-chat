@@ -7,12 +7,27 @@
   <style>
     #makeMeDraggable { width: 50px; height: 50px; background: red; }
     #game-board, .game-board { position: relative; height: 600px; width: 600px; background-image: url("checker-board.png"); margin: 0 auto; }
-    #canvas { display: table; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 1px solid orange; }
+    #canvas { display: table; position: absolute; top: 0; left: 0; width: 100%; height: 100%; }
     .middle { position: relative; display: table-cell; vertical-align: middle; }
-    .snap-point { display: block; position: absolute; width:37.5px; height:37.5px; background-color: yellow; border: 1px solid black; }
-    /* .snap-point { display: block; position: absolute; width:20px; height:20px; background-color: yellow; border: 1px solid black; } */
+    .snap-point { display: block; position: absolute; width:37.5px; height:37.5px; background-color: none; border: 1px solid black; }
     #msg { border: 1px solid orange; width: 100%; min-height: 2em; }
-    .moving { opacity: 0.5; background-color: green; }
+    .moving { opacity: 0.5 }
+    .game-piece { width: 50px; height: 50px; }
+
+    .white-king { position: relative; height: 50px; width: 50px; background-image: url("white-king.png") }
+    .white-queen { position: relative; height: 50px; width: 50px; background-image: url("white-queen.png") }
+    .white-rook { position: relative; height: 50px; width: 50px; background-image: url("white-rook.png") }
+    .white-bishop { position: relative; height: 50px; width: 50px; background-image: url("white-bishop.png") }
+    .white-knight { position: relative; height: 50px; width: 50px; background-image: url("white-knight.png") }
+    .white-pawn { position: relative; height: 50px; width: 50px; background-image: url("white-pawn.png") }
+
+    .black-king { position: relative; height: 50px; width: 50px; background-image: url("black-king.png") }
+    .black-queen { position: relative; height: 50px; width: 50px; background-image: url("black-queen.png") }
+    .black-rook { position: relative; height: 50px; width: 50px; background-image: url("black-rook.png") }
+    .black-bishop { position: relative; height: 50px; width: 50px; background-image: url("black-bishop.png") }
+    .black-knight { position: relative; height: 50px; width: 50px; background-image: url("black-knight.png") }
+    .black-pawn { position: relative; height: 50px; width: 50px; background-image: url("black-pawn.png") }
+    
   </style>  
   
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
@@ -46,8 +61,12 @@
       opacity: 0.5
     });
 
+    $('.game-piece').draggable({
+      opacity: 0.5
+    });
+
     $('#game-board').droppable({
-      accept: function(item){ return true }, 
+      accept: '.game-piece', 
 
       drop: function(event, ui) {
         var $this = $(this);
@@ -78,8 +97,8 @@
 
         for(var i = 0; i < snapPoints.length; i++){
           var snapPoint = snapPoints[i]
-          snapPoint.width = $("#makeMeDraggable").find('.snap-point').width();
-          snapPoint.height = $("#makeMeDraggable").find('.snap-point').height();
+          snapPoint.width = $(draggable_obj).find('.snap-point').width();
+          snapPoint.height = $(draggable_obj).find('.snap-point').height();
           $('#msg ul').append("<li>" + JSON.stringify(snapPoint) + ": snapPoint dimensions<\/li>");
 
           if(checkLeftTop(draggable_pos, snapPoint, gameBoardOffset) 
@@ -120,24 +139,41 @@
     </div>
   </div>
   
-  <div id="content" style="height: 100px;">
-    <div id="makeMeDraggable">
-    </div>
-  </div>
+  <div id="black-king" class="black-king game-piece"></div>
+  <div id="black-queen" class="black-queen game-piece"></div>
+  <div id="black-rook-01" class="black-rook game-piece"></div>
+  <div id="black-rook-02" class="black-rook game-piece"></div>
+  <div id="black-bishop-01" class="black-bishop game-piece"></div>
+  <div id="black-bishop-02" class="black-bishop game-piece"></div>
+  <div id="black-knight-01" class="black-knight game-piece"></div>
+  <div id="black-knight-02" class="black-knight game-piece"></div>
+  <div id="black-pawn-01" class="black-pawn game-piece"></div>
+  <div id="black-pawn-02" class="black-pawn game-piece"></div>
+  <div id="black-pawn-03" class="black-pawn game-piece"></div>
+  <div id="black-pawn-04" class="black-pawn game-piece"></div>
+  <div id="black-pawn-05" class="black-pawn game-piece"></div>
+  <div id="black-pawn-06" class="black-pawn game-piece"></div>
+  <div id="black-pawn-07" class="black-pawn game-piece"></div>
+  <div id="black-pawn-08" class="black-pawn game-piece"></div>
+
   
-  <div id="black-king" class="game-piece"></div>
-  <div id="black-queen" class="game-piece"></div>
-  <div id="black-rook" class="game-piece"></div>
-  <div id="black-bishop" class="game-piece"></div>
-  <div id="black-knight" class="game-piece"></div>
-  <div id="black-pawn" class="game-piece"></div>
-  
-  <div id="white-king" class="game-piece"></div>
-  <div id="white-queen" class="game-piece"></div>
-  <div id="white-rook" class="game-piece"></div>
-  <div id="white-bishop" class="game-piece"></div>
-  <div id="white-knight" class="game-piece"></div>
-  <div id="white-pawn" class="game-piece"></div>
+  <div id="white-king" class="white-king game-piece"></div>
+  <div id="white-queen" class="white-queen game-piece"></div>
+  <div id="white-rook-01" class="white-rook game-piece"></div>
+  <div id="white-rook-02" class="white-rook game-piece"></div>
+  <div id="white-bishop-01" class="white-bishop game-piece"></div>
+  <div id="white-bishop-02" class="white-bishop game-piece"></div>
+  <div id="white-knight-01" class="white-knight game-piece"></div>
+  <div id="white-knight-02" class="white-knight game-piece"></div>
+  <div id="white-pawn-01" class="white-pawn game-piece"></div>
+  <div id="white-pawn-02" class="white-pawn game-piece"></div>
+  <div id="white-pawn-03" class="white-pawn game-piece"></div>
+  <div id="white-pawn-04" class="white-pawn game-piece"></div>
+  <div id="white-pawn-05" class="white-pawn game-piece"></div>
+  <div id="white-pawn-06" class="white-pawn game-piece"></div>
+  <div id="white-pawn-07" class="white-pawn game-piece"></div>
+  <div id="white-pawn-08" class="white-pawn game-piece"></div>
+
   
   <div id="msg" style="display: none; "></div>
   <div id="templates" style="display: none; ">
@@ -154,6 +190,17 @@
       return {width: $('#templates .snap-point').width(), height: $('#templates .snap-point').height()};
     }
 
+    function getGameBoardOffset(){
+      return {top: $('#game-board')[0].offsetTop, left: $('#game-board')[0].offsetLeft};
+    }
+
+    function getSnapPoint(index){
+      var snapPoint = snapPoints[index]
+      snapPoint.width = $('#templates .snap-point').width();
+      snapPoint.height = $('#templates .snap-point').height();
+      return snapPoint;
+    }
+
     function createSnapPoint(selector){
       var x, y;
       if(arguments.length > 1){
@@ -166,6 +213,8 @@
       }
 
       $(selector).first().append('<div id="snap-point-' + x + '-' + y + '" class="snap-point" style="top: ' + y + 'px; left: ' + x + 'px; "></div>');
+
+      return $(selector).find('.snap-point').last();
     }
 
     var snapPoints = []
@@ -176,19 +225,76 @@
       var layoutSnapPointDimensions = {width: snapPointDimensions.width*2, height: snapPointDimensions.height*2};
       var gameBoardDimensions = getGameBoardDimensions();
 
-      for(var i=snapPointDimensions.width/2; i < gameBoardDimensions.width; i+=layoutSnapPointDimensions.width){
-        for(var j=snapPointDimensions.height/2; j < gameBoardDimensions.height; j+=layoutSnapPointDimensions.height){
-          createSnapPoint('#game-board', i, j);
+      for(var j=snapPointDimensions.height/2; j < gameBoardDimensions.height; j+=layoutSnapPointDimensions.height){
+        for(var i=snapPointDimensions.width/2; i < gameBoardDimensions.width; i+=layoutSnapPointDimensions.width){
+          var sp = createSnapPoint('#game-board', i, j);
+          //$(sp).text(i + "," + j);
           snapPoints.push({top: j, left: i})
           $('#msg ul').append("<li>" + JSON.stringify({top: j, left: i}) + ": snap point create<\/li>");
         }
       }
 
+      // createSnapPoint('#makeMeDraggable');
+      // var cursorLeft = Math.round($("#makeMeDraggable").width() / 2);
+      // var cursorTop = Math.round($("#makeMeDraggable").height() / 2);
+      // $( "#makeMeDraggable" ).draggable( "option", "cursorAt", { left: cursorLeft, top: cursorTop } );
 
-      createSnapPoint('#makeMeDraggable');
-      var cursorLeft = Math.round($("#makeMeDraggable").width() / 2);
-      var cursorTop = Math.round($("#makeMeDraggable").height() / 2);
-      $( "#makeMeDraggable" ).draggable( "option", "cursorAt", { left: cursorLeft, top: cursorTop } );
+      $('.game-piece').each( function(index){
+        createSnapPoint($(this));
+        var cursorLeft = Math.round($(this).width() / 2);
+        var cursorTop = Math.round($(this).height() / 2);
+        $( this ).draggable( "option", "cursorAt", { left: cursorLeft, top: cursorTop } );
+      });
+
+
+      var offset = 0;
+      $.each(["black-rook-01", "black-knight-01", "black-bishop-01", "black-king", "black-queen", "black-bishop-02", "black-knight-02", "black-rook-02"], function(index, gamePieceName){
+        var gameBoardOffset = getGameBoardOffset();
+        var snapPoint = getSnapPoint(index + offset);
+        var draggable_obj = $('#' + gamePieceName);
+        $( draggable_obj )[0].style.position = "absolute";
+
+        $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+      });
+      
+      offset = 8;
+      $.each(["black-pawn-01", "black-pawn-02", "black-pawn-03", "black-pawn-04", "black-pawn-05", "black-pawn-06", "black-pawn-07", "black-pawn-08"], function(index, gamePieceName){
+        var gameBoardOffset = getGameBoardOffset();
+        var snapPoint = getSnapPoint(index + offset);
+        var draggable_obj = $('#' + gamePieceName);
+        $( draggable_obj )[0].style.position = "absolute";
+
+        $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+      });
+      
+      offset = 48;
+      $.each(["white-pawn-01", "white-pawn-02", "white-pawn-03", "white-pawn-04", "white-pawn-05", "white-pawn-06", "white-pawn-07", "white-pawn-08"], function(index, gamePieceName){
+        var gameBoardOffset = getGameBoardOffset();
+        var snapPoint = getSnapPoint(index + offset);
+        var draggable_obj = $('#' + gamePieceName);
+        $( draggable_obj )[0].style.position = "absolute";
+
+        $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+      });
+      
+      offset = 56;
+      $.each(["white-rook-01", "white-knight-01", "white-bishop-01", "white-king", "white-queen", "white-bishop-02", "white-knight-02", "white-rook-02"], function(index, gamePieceName){
+        var gameBoardOffset = getGameBoardOffset();
+        var snapPoint = getSnapPoint(index + offset);
+        var draggable_obj = $('#' + gamePieceName);
+        $( draggable_obj )[0].style.position = "absolute";
+
+        $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+      });
+      
+
+      // $.each([ "white-king", "white-queen", "white-rook", "white-bishop", "white-knight", "white-pawn", "black-king", "black-queen", "black-rook", "black-bishop", "black-knight", "black-pawn" ], function( index, value ) {
+      //   var gamePieceName = '.' + value
+      //   createSnapPoint(gamePieceName);
+      //   var cursorLeft = Math.round($(gamePieceName).width() / 2);
+      //   var cursorTop = Math.round($(gamePieceName).height() / 2);
+      //   $( gamePieceName ).draggable( "option", "cursorAt", { left: cursorLeft, top: cursorTop } );
+      // });
     });
   </script>
 </body>
