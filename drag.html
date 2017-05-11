@@ -5,12 +5,13 @@
   <title></title>
 
   <style>
-    #makeMeDraggable { width: 300px; height: 300px; background: red; }
-    #game-board { position: relative; height: 800px; width: 800px; background-color: blue; margin: 0 auto; }
+    #makeMeDraggable { width: 50px; height: 50px; background: red; }
+    #game-board, .game-board { position: relative; height: 600px; width: 600px; background-image: url("checker-board.png"); margin: 0 auto; }
     #canvas { display: table; position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 1px solid orange; }
     .middle { position: relative; display: table-cell; vertical-align: middle; }
-    .snap-point { display: block; position: absolute; width:10px; height:10px; background-color: yellow; border: 1px solid black; }
-    #msg { border: 1px solid orange; width: 100%; display: block; min-height: 2em;}
+    .snap-point { display: block; position: absolute; width:37.5px; height:37.5px; background-color: yellow; border: 1px solid black; }
+    /* .snap-point { display: block; position: absolute; width:20px; height:20px; background-color: yellow; border: 1px solid black; } */
+    #msg { border: 1px solid orange; width: 100%; min-height: 2em; }
     .moving { opacity: 0.5; background-color: green; }
   </style>  
   
@@ -42,7 +43,6 @@
 
   function init() {
     $('#makeMeDraggable').draggable({
-      cursorAt: { left: 150, top: 150 }, 
       opacity: 0.5
     });
 
@@ -80,6 +80,7 @@
           var snapPoint = snapPoints[i]
           snapPoint.width = $("#makeMeDraggable").find('.snap-point').width();
           snapPoint.height = $("#makeMeDraggable").find('.snap-point').height();
+          $('#msg ul').append("<li>" + JSON.stringify(snapPoint) + ": snapPoint dimensions<\/li>");
 
           if(checkLeftTop(draggable_pos, snapPoint, gameBoardOffset) 
             || checkRightTop(draggable_pos, snapPoint, gameBoardOffset) 
@@ -87,10 +88,18 @@
             || checkLeftBottom(draggable_pos, snapPoint, gameBoardOffset)){
 
             var droppable_info = '#snap-point-' + snapPoint.left + '-' + snapPoint.top
+          $('#msg ul').append("<li>" + JSON.stringify(droppable_info) + ": droppable_info<\/li>");
 
-            $( draggable_obj ).position({ my: "center", at: "center", of: droppable_info, 
-              using: function(pos) { $(this).animate(pos, 200, "linear"); }
-            });
+            $( draggable_obj )[0].style.position = "absolute";
+            // $( draggable_obj )[0].style.left = "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px";
+            // $( draggable_obj )[0].style.top = "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px";
+
+            $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+
+
+            // $( draggable_obj ).position({ my: "center", at: "center", of: droppable_info
+            //   using: function(pos) { $(this).animate(pos, 200, "linear"); }
+            // });
 
             break;
           }
@@ -106,35 +115,80 @@
   
   <div id="canvas">
     <div class="middle">
-      <div id="game-board"></div>
+      <div id="game-board">
+      </div>
     </div>
   </div>
   
-  <div id="content" style="height: 400px;">
+  <div id="content" style="height: 100px;">
     <div id="makeMeDraggable">
-      
     </div>
   </div>
   
-  <div id="msg"></div>
+  <div id="black-king" class="game-piece"></div>
+  <div id="black-queen" class="game-piece"></div>
+  <div id="black-rook" class="game-piece"></div>
+  <div id="black-bishop" class="game-piece"></div>
+  <div id="black-knight" class="game-piece"></div>
+  <div id="black-pawn" class="game-piece"></div>
+  
+  <div id="white-king" class="game-piece"></div>
+  <div id="white-queen" class="game-piece"></div>
+  <div id="white-rook" class="game-piece"></div>
+  <div id="white-bishop" class="game-piece"></div>
+  <div id="white-knight" class="game-piece"></div>
+  <div id="white-pawn" class="game-piece"></div>
+  
+  <div id="msg" style="display: none; "></div>
+  <div id="templates" style="display: none; ">
+    <div class='snap-point'></div>
+    <div class='game-board'></div>
+  </div>
   
   <script>
-    function createSnapPoint(selector, x, y){
+    function getGameBoardDimensions(){
+      return {width: $('#templates .game-board').width(), height: $('#templates .game-board').height()};
+    }
+
+    function getSnapPointDimensions(){
+      return {width: $('#templates .snap-point').width(), height: $('#templates .snap-point').height()};
+    }
+
+    function createSnapPoint(selector){
+      var x, y;
+      if(arguments.length > 1){
+        x = arguments[1];
+        y = arguments[2];
+      } else {
+        var snapPointDimensions = getSnapPointDimensions();
+        x = $(selector).width() / 2 - snapPointDimensions.width/2;
+        y = $(selector).height() / 2 - snapPointDimensions.height/2;
+      }
+
       $(selector).first().append('<div id="snap-point-' + x + '-' + y + '" class="snap-point" style="top: ' + y + 'px; left: ' + x + 'px; "></div>');
     }
 
     var snapPoints = []
 
     $(document).ready(function(){
-      for(var i=0; i < 800; i+=20){
-        for(var j=0; j < 800; j+=20){
+        $('#msg').append("<ul><\/ul>")
+      var snapPointDimensions = getSnapPointDimensions();
+      var layoutSnapPointDimensions = {width: snapPointDimensions.width*2, height: snapPointDimensions.height*2};
+      var gameBoardDimensions = getGameBoardDimensions();
+
+      for(var i=snapPointDimensions.width/2; i < gameBoardDimensions.width; i+=layoutSnapPointDimensions.width){
+        for(var j=snapPointDimensions.height/2; j < gameBoardDimensions.height; j+=layoutSnapPointDimensions.height){
           createSnapPoint('#game-board', i, j);
           snapPoints.push({top: j, left: i})
+          $('#msg ul').append("<li>" + JSON.stringify({top: j, left: i}) + ": snap point create<\/li>");
         }
       }
 
-      createSnapPoint('#makeMeDraggable', 145, 145);
-      console.log('hiii');
+
+      createSnapPoint('#makeMeDraggable');
+      var cursorLeft = Math.round($("#makeMeDraggable").width() / 2);
+      var cursorTop = Math.round($("#makeMeDraggable").height() / 2);
+      $( "#makeMeDraggable" ).draggable( "option", "cursorAt", { left: cursorLeft, top: cursorTop } );
     });
   </script>
 </body>
