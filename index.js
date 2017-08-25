@@ -30,6 +30,13 @@ res.sendFile(__dirname + '/index.html');
 var users = [];
   
 io.on('connection', function(socket){
+
+  //listen for: socket.emit('gameupdate', draggable_obj.attr("id"));
+  socket.on('gameupdate', function(draggableObjId, snapPoint){
+    io.emit('gameupdate', draggableObjId, snapPoint);
+    console.log('game piece was moved: ' + draggableObjId);
+  });
+  
   socket.on('login', function(username){
     socket.username = username;
     users.push(username);

@@ -30,6 +30,7 @@
     
   </style>  
   
+  <script src="/socket.io/socket.io.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.5.0/jquery.min.js"></script>
   <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/jquery-ui.min.js"></script>
 
@@ -56,7 +57,20 @@
     return ((draggable.left > (droppable.left + offset.left)) && (draggable.left < (droppable.left + offset.left + droppable.width)) && ((draggable.top + draggable.height) > (droppable.top + offset.top)) && ((draggable.top + draggable.height) < ((droppable.top + offset.top) + droppable.height)));
   }
 
+  function moveGamePiece(gameBoard, draggable_obj, snapPoint){
+    var gameBoardOffset = {top: gameBoard[0].offsetTop, left: gameBoard[0].offsetLeft};
+    $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+  }
+
   function init() {
+    var socket = io();
+    socket.on('gameupdate', function(draggableObjId, snapPointJson){
+      var gameBoard = $('#game-board')
+      var draggable_obj = $(draggableObjId)
+      var snapPoint = JSON.parse(snapPointJson)
+      moveGamePiece(gameBoard, draggable_obj, snapPoint);
+    });
+    
     $('#makeMeDraggable').draggable({
       opacity: 0.5
     });
@@ -69,11 +83,15 @@
       accept: '.game-piece', 
 
       drop: function(event, ui) {
-        var $this = $(this);
+        var gameBoard = $(this)
+        var draggable_obj = $(ui.draggable)
+        var snapPoint = null;
+
         if( $('#msg ul').length > 0 ){ $('#msg ul').remove(); }
         $('#msg').append("<ul><\/ul>")
 
-        var draggable_obj = $(ui.draggable)
+        console.log("dropped: " + draggable_obj.attr("id"));
+        
         var draggable_pos = $(draggable_obj).position();
         var draggable_snap_point = $(draggable_obj).find('.snap-point')
         var draggable_snap_point_pos = $(draggable_snap_point).position()
@@ -92,11 +110,11 @@
         draggable_pos.right = draggable_pos.left + draggable_pos.width;
           $('#msg ul').append("<li>" + JSON.stringify(draggable_pos) + ": draggable final<\/li>")
 
-        var gameBoardOffset = {top: $this[0].offsetTop, left: $this[0].offsetLeft};
+        var gameBoardOffset = {top: gameBoard[0].offsetTop, left: gameBoard[0].offsetLeft};
           $('#msg ul').append("<li>" + JSON.stringify(gameBoardOffset) + ": gameboard offset<\/li>");
 
         for(var i = 0; i < snapPoints.length; i++){
-          var snapPoint = snapPoints[i]
+          snapPoint = snapPoints[i]
           snapPoint.width = $(draggable_obj).find('.snap-point').width();
           snapPoint.height = $(draggable_obj).find('.snap-point').height();
           $('#msg ul').append("<li>" + JSON.stringify(snapPoint) + ": snapPoint dimensions<\/li>");
@@ -113,8 +131,8 @@
             // $( draggable_obj )[0].style.left = "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px";
             // $( draggable_obj )[0].style.top = "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px";
 
-            $( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
-
+            //$( draggable_obj ).animate({'top': "" + (gameBoardOffset.top + snapPoint.top + (snapPoint.height/2) - ($( draggable_obj ).height()/2)) + "px", 'left': "" + (gameBoardOffset.left + snapPoint.left + (snapPoint.width/2) - ($( draggable_obj ).width()/2)) + "px"}, 200);
+            moveGamePiece(gameBoard, draggable_obj, snapPoint);
 
             // $( draggable_obj ).position({ my: "center", at: "center", of: droppable_info
             //   using: function(pos) { $(this).animate(pos, 200, "linear"); }
@@ -124,6 +142,8 @@
           }
         }
         $('#msg ul').prepend("<li>DONE<\/li>")
+        
+        socket.emit('gameupdate', "#" + draggable_obj.attr("id"), JSON.stringify(snapPoint));
       }
     });
   }
